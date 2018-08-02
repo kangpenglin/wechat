@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +11,8 @@ use App\LqUserActi;
 use App\LqActivity;
 use Illuminate\Support\Facades\Redirect;
 use Carbon\Carbon;
-
+use App\LqTag;
+use App\LqUserTag;
 
 class LqControl extends Controller
 {
@@ -87,6 +88,104 @@ class LqControl extends Controller
         ]);
 
     }
+    /*增加个人的标签
+     *
+     */
+        public function personalTag( Request $request)
+    {
+
+        $result=LqUser::where('wechat_id',$request->input('wechat_id'))->get();
+        if ($result->isEmpty())
+            return response()->json([
+                "code" => 401,
+                "msg"  => "failed",
+
+            ]);
+        $resultTag=LqTag::where('id',$request->input('tag'))->get();
+        if ($resultTag->isEmpty())
+            return response()->json([
+                "code" =>400,
+                "msg"  =>"failed",
+            ]);
+        //保证数据库已有用户及正确的标签
+        $tag=new LqUserTag();
+        $tag->id_user=$request->input('wechat_id');
+        $tag->id_tag=$request->input('tag');
+        $bool=$tag->save();
+	return response()->json([
+		"code" =>200,
+		"msg"  => "success"
+	]);
+
+	}
+
+    /*获得标签信息
+     */
+
+    public function infoTag(Request $request)
+    {
+	    $result=$request->input('wechat_id');
+	    $result=str_replace('"','',$result);
+	    $resultFind=LqUser::where('wechat_id',$result)->get();
+	     
+	    if ($resultFind->isEmpty())
+	    
+		    return response()->json([
+	          	    "code" =>400,
+			    "msg"  =>"fail"
+		    ]);
+	    $tag=LqUserTag::where('id_user',$result)->get();
+	    $arr=array();
+	    
+	    foreach ($tag as $i)
+	    {
+		    $arr[]=$i->id_tag;
+		    
+	    }
+	    return response()->json([
+	    	"code" =>200,
+		"msg"  =>"success",
+		"tag"  =>$arr
+	    
+	    ]);
+	   
+	  }
+     
+      /*用户推荐
+      */
+      public function recommend(Request $request)
+      {
+            $result=$request->input('wechat_id');
+            $result=str_replace('"','',$result);
+            $resultFind=LqUser::where('wechat_id',$result)->get();
+
+            if ($resultFind->isEmpty())
+
+               return response()->json([
+                        "code" =>400,
+                        "msg"  =>"fail"
+		]);
+
+	    $timedate=date("Y-m-d");
+	   $time=date("h:m:s"); 
+	    $resulttime=LqActivity::whereDate('date','>=',$timedate)->get();
+	    if (count($resulttime)<10)
+	    {
+		    $arr=array();
+		    foreach ($resulttime as $i)
+			    $arr[]=$i->activity_id;
+		    return response()->json([
+			    "code" =>200,
+			    "msg"  =>"success",
+			    "activity" =>$arr
+		    
+		    ]);
+		    
+	    }
+
+      } 
+
+
 
     /**
      * put 无法获得数据，故改为post

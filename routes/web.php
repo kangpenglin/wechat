@@ -31,7 +31,7 @@ Route::post('me/{wechat_id}', 'LqControl@updateOWnDetails');
 Route::post('activity', 'ActivityController@createActivity');
 
 // 删除活动
-Route::delete('activity/{wechat_id}/created/{activity_id}', 'ActivityController@deleteActivity');
+Route::delete('applets/deleteActivity/{wechat_id}/created/{activity_id}', 'ActivityController@deleteActivity');
 
 // 更新活动
 Route::post('activity/{wechat_id}/created/{activity_id}', 'ActivityController@updateActivity');
@@ -44,20 +44,28 @@ Route::get('activity/{wechat_id}', 'ActivityController@getAllActivity');
 Route::get('activity/search/{search_key}', 'ActivityController@searchActivity');
 
 // 查看自己所在活动
-Route::get('activity/list/{wechat_id}', 'ActivityController@getOwnActivity');
+Route::get('applets/search/list/{wechat_id}', 'ActivityController@getOwnActivity');
 
 // 查看活动详情
-Route::get('activity/{wechat_id}/detail/{activity_id}', 'ActivityController@getActivityDetails');
+Route::get('applets/detail/{wechat_id}/detail/{activity_id}', 'ActivityController@getActivityDetails');
 
 // 加入活动
-Route::post('activity/detail/', 'ActivityController@participateActivity');
+Route::post('applets/enroll/', 'ActivityController@participateActivity');
 
 // 退出活动
-Route::delete('activity/{wechat_id}/detail/{activity_id}', 'ActivityController@unparticipateActivity');
+Route::delete('applets/exitActivity/{wechat_id}/detail/{activity_id}', 'ActivityController@unparticipateActivity');
 
 // 查看自己的信息
 Route::get('me/{wechat_id}', 'LqControl@getOwnDetails');
 
+//个人标签
+Route::post('applets/setTag','LqControl@personalTag');
+
+//标签信息
+Route::get('applets/profile','LqControl@infoTag');
+
+//推荐列表
+Route::get('applets/activity','LqControl@recommend');
 
 Route::post('activity/shift', 'ActivityController@shiftActivity');
 
